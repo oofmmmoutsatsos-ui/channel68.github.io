@@ -1,21 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Live TV</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulated Weather — New Brunswick</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #87CEEB, #f0f8ff);
+      color: #333;
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .weather-card {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      min-width: 250px;
+    }
+
+    .weather-icon {
+      width: 100px;
+      height: 100px;
+    }
+
+    p {
+      margin: 10px 0;
+      font-size: 1.2em;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <h1>🔴 Live TV</h1>
-  <a href="index.html" class="live-link">🏠 Home</a>
-</header>
+  <h1>🌤 Simulated Weather — New Brunswick</h1>
 
-<video controls autoplay muted loop>
-  <source src="videos/live.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+  <div class="weather-card">
+    <img id="icon" class="weather-icon" src="" alt="Weather Icon" />
+    <p id="temp">Loading temperature...</p>
+    <p id="description"></p>
+    <p id="humidity"></p>
+    <p id="wind"></p>
+  </div>
+
+  <script>
+    // Simulated weather data for demonstration
+    const weatherData = {
+      temp: 5.3, // Celsius
+      description: "Partly cloudy",
+      humidity: 65, // Percent
+      wind: 3.4, // m/s
+      icon: "03d" // OpenWeatherMap icon code for partly cloudy day
+    };
+
+    function updateWeather() {
+      const iconUrl = `https://openweathermap.org/img/wn/${weatherData.icon}@2x.png`;
+
+      document.getElementById('temp').textContent = `🌡 Temperature: ${weatherData.temp.toFixed(1)}°C`;
+      document.getElementById('description').textContent = `🌥 Condition: ${weatherData.description}`;
+      document.getElementById('humidity').textContent = `💧 Humidity: ${weatherData.humidity}%`;
+      document.getElementById('wind').textContent = `🌬 Wind: ${weatherData.wind} m/s`;
+      document.getElementById('icon').src = iconUrl;
+      document.getElementById('icon').alt = weatherData.description;
+    }
+
+    // Initialize with simulated data
+    updateWeather();
+
+    // Optional: Randomize weather every 10 minutes (600000 ms)
+    setInterval(() => {
+      // Randomize temperature between -5 and 15
+      weatherData.temp = (Math.random() * 20 - 5).toFixed(1);
+      // Randomize humidity between 40 and 90
+      weatherData.humidity = Math.floor(Math.random() * 50 + 40);
+      // Randomize wind speed between 0 and 10
+      weatherData.wind = (Math.random() * 10).toFixed(1);
+
+      // Randomly pick a weather description and icon
+      const weatherOptions = [
+        { desc: "Clear sky", icon: "01d" },
+        { desc: "Few clouds", icon: "02d" },
+        { desc: "Scattered clouds", icon: "03d" },
+        { desc: "Broken clouds", icon: "04d" },
+        { desc: "Shower rain", icon: "09d" },
+        { desc: "Rain", icon: "10d" },
+        { desc: "Thunderstorm", icon: "11d" },
+        { desc: "Snow", icon: "13d" },
+        { desc: "Mist", icon: "50d" }
+      ];
+      const choice = weatherOptions[Math.floor(Math.random() * weatherOptions.length)];
+      weatherData.description = choice.desc;
+      weatherData.icon = choice.icon;
+
+      updateWeather();
+    }, 600000); // Update every 10 minutes
+  </script>
 
 </body>
 </html>

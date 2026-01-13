@@ -9,33 +9,118 @@
 
 <header>
   <h1>📺 Channel 68 📺</h1>
-  <a href="live.html" class="live-link">🔴 LIVE</a>
+  <a href="live.html" class="live-link">🔴 LIVE Weather 🔴</a>
 </header>
 
-<!-- Category Filters -->
+<!-- Main Tabs -->
+<div id="tabs">
+  <button onclick="showVideos()">Videos</button>
+  <button onclick="showEvents()">Events</button>
+</div>
+
+<!-- Category Filters (Videos only) -->
 <div id="filters">
   <button onclick="filterVideos('All')">All</button>
   <button onclick="filterVideos('News')">News</button>
   <button onclick="filterVideos('Sports')">Sports</button>
 </div>
 
+<!-- Videos -->
 <div id="videos">Loading segments...</div>
+
+<!-- Events -->
+<div id="events" style="display:none;">
+
+  <!-- Event Tabs -->
+  <div id="event-tabs">
+    <button onclick="showRecurring()">Recurring</button>
+    <button onclick="showOneTime()">One-Time</button>
+  </div>
+
+  <!-- Recurring Events -->
+  <div id="recurring-events">
+    <div class="event-card">
+      <h3>🎮 Game Night</h3>
+      <p>Friday – Sunday</p>
+      <p>Play games, do whatever.</p>
+    </div>
+
+    <div class="event-card">
+      <h3>🥊 Yomi Hustle Practice</h3>
+      <p>Thursday</p>
+      <p>Practice Yomi for tournaments.</p>
+    </div>
+
+    <div class="event-card">
+      <h3>📺 New Episode of Channel 68</h3>
+      <p>Friday every month</p>
+      <p>Watch and enjoy.</p>
+    </div>
+  </div>
+  
+
+  <!-- One-Time Events -->
+  <div id="onetime-events" style="display:none;">
+    <div class="event-card">
+      <h3>empty</h3>
+      <p></p>
+      <p></p>
+    </div>
+  </div>
+
+</div>
 
 <script>
 let allVideos = [];
+
+/* ========= MORNING NEWS (YOUTUBE) ========= */
+
+const MORNING_NEWS_DATE_KEY = "morningNewsDate";
+const MORNING_NEWS_INDEX_KEY = "morningNewsIndex";
+
+// YouTube search embed for general latest news
+const YOUTUBE_NEWS_BASE =
+  "https://www.youtube.com/embed/videoseries?list=PLd9pLwfvcsdSXJufULeZqnduIJ1peUP3B";
+
+
+
+// Get "broadcast date" (day rolls over at 6 AM)
+function getBroadcastDate() {
+  const now = new Date();
+  if (now.getHours() < 6) {
+    now.setDate(now.getDate() - 1);
+  }
+  return now.toISOString().split("T")[0];
+}
+
+function getDailyMorningNewsEmbed() {
+  const today = getBroadcastDate();
+  const savedDate = localStorage.getItem(MORNING_NEWS_DATE_KEY);
+  let index = localStorage.getItem(MORNING_NEWS_INDEX_KEY);
+
+  if (savedDate !== today || index === null) {
+    index = Math.floor(Math.random() * 30); // rotate search results
+    localStorage.setItem(MORNING_NEWS_DATE_KEY, today);
+    localStorage.setItem(MORNING_NEWS_INDEX_KEY, index);
+  }
+
+  return `${YOUTUBE_NEWS_BASE}&index=${index}`;
+}
+
+/* ========= LOAD LOCAL VIDEOS ========= */
 
 fetch("data.json")
   .then(res => res.json())
   .then(data => {
     allVideos = data;
-    renderVideos(data);
+    renderVideos(allVideos);
   });
 
 function renderVideos(list) {
   const container = document.getElementById("videos");
   container.innerHTML = "";
 
-  if(list.length === 0){
+  if (list.length === 0) {
     container.textContent = "No videos available.";
     return;
   }
@@ -44,15 +129,32 @@ function renderVideos(list) {
     const card = document.createElement("div");
     card.className = "video-card";
 
-    card.innerHTML = `
-      <img src="thumbnails/${item.thumbnail}" class="thumb">
-      <h3>${item.title}</h3>
-      <p class="category">${item.category}</p>
-      <video controls>
-        <source src="videos/${item.file}" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-    `;
+    // 🌅 Morning News slot → YouTube embed
+    if (item.slot === "morning-news") {
+      card.innerHTML = `
+        <h3>🌅 Morning News</h3>
+        <p class="category">News • Updates daily at 6 AM</p>
+        <iframe
+          width="560"
+          height="315"
+          src="${getDailyMorningNewsEmbed()}"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      `;
+    } else {
+      // Normal local video
+      card.innerHTML = `
+        <img src="thumbnails/${item.thumbnail}" class="thumb">
+        <h3>${item.title}</h3>
+        <p class="category">${item.category}</p>
+        <video controls>
+          <source src="videos/${item.file}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      `;
+    }
 
     container.appendChild(card);
   });
@@ -62,8 +164,37 @@ function filterVideos(category) {
   if (category === "All") {
     renderVideos(allVideos);
   } else {
-    renderVideos(allVideos.filter(v => v.category === category));
+    renderVideos(allVideos.filter(v =>
+      v.category === category || v.slot === "morning-news"
+    ));
   }
+}
+
+/* ========= MAIN TABS ========= */
+
+function showVideos() {
+  document.getElementById("videos").style.display = "grid";
+  document.getElementById("filters").style.display = "block";
+  document.getElementById("events").style.display = "none";
+}
+
+function showEvents() {
+  document.getElementById("videos").style.display = "none";
+  document.getElementById("filters").style.display = "none";
+  document.getElementById("events").style.display = "block";
+  showRecurring();
+}
+
+/* ========= EVENT TABS ========= */
+
+function showRecurring() {
+  document.getElementById("recurring-events").style.display = "block";
+  document.getElementById("onetime-events").style.display = "none";
+}
+
+function showOneTime() {
+  document.getElementById("recurring-events").style.display = "none";
+  document.getElementById("onetime-events").style.display = "block";
 }
 </script>
 

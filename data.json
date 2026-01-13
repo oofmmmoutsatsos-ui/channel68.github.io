@@ -1,7 +1,9 @@
 [
+
   {
-    "title": "Morning News",
-    "file": "example.mp4"
+   "title": "Morning News",
+   "category": "News",
+   "slot": "morning-news"
   },
   {
     "title": "Evening News",
@@ -15,4 +17,6 @@
     "thumbnail": "sports.png",
     "category": "Sports"
   }
+
+
 ]
