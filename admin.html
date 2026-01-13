@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Add Segment</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Admin – Add Segment</h2>
+<p>Upload video to <code>videos/</code> and thumbnail to <code>thumbnails/</code></p>
+
+<input id="title" placeholder="Segment Title"><br><br>
+<input id="file" placeholder="Video filename (example.mp4)"><br><br>
+<input id="thumbnail" placeholder="Thumbnail filename (example.jpg)"><br><br>
+<input id="category" placeholder="Category (News/Sports/etc.)"><br><br>
+
+<button onclick="generate()">Generate JSON Entry</button>
+
+<h3>Copy this into <code>data.json</code>:</h3>
+<pre id="output"></pre>
+
+<script>
+function generate() {
+  const title = document.getElementById("title").value.trim();
+  const file = document.getElementById("file").value.trim();
+  const thumbnail = document.getElementById("thumbnail").value.trim();
+  const category = document.getElementById("category").value.trim();
+
+  if (!title || !file || !thumbnail || !category) {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  document.getElementById("output").textContent =
+`{
+  "title": "${title}",
+  "file": "${file}",
+  "thumbnail": "${thumbnail}",
+  "category": "${category}"
+},`;
+}
+</script>
+
+</body>
+</html>

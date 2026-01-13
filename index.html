@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Channel 68</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>📺 Channel 68 📺</h1>
+  <a href="live.html" class="live-link">🔴 LIVE</a>
+</header>
+
+<!-- Category Filters -->
+<div id="filters">
+  <button onclick="filterVideos('All')">All</button>
+  <button onclick="filterVideos('News')">News</button>
+  <button onclick="filterVideos('Sports')">Sports</button>
+</div>
+
+<div id="videos">Loading segments...</div>
+
+<script>
+let allVideos = [];
+
+fetch("data.json")
+  .then(res => res.json())
+  .then(data => {
+    allVideos = data;
+    renderVideos(data);
+  });
+
+function renderVideos(list) {
+  const container = document.getElementById("videos");
+  container.innerHTML = "";
+
+  if(list.length === 0){
+    container.textContent = "No videos available.";
+    return;
+  }
+
+  list.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "video-card";
+
+    card.innerHTML = `
+      <img src="thumbnails/${item.thumbnail}" class="thumb">
+      <h3>${item.title}</h3>
+      <p class="category">${item.category}</p>
+      <video controls>
+        <source src="videos/${item.file}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function filterVideos(category) {
+  if (category === "All") {
+    renderVideos(allVideos);
+  } else {
+    renderVideos(allVideos.filter(v => v.category === category));
+  }
+}
+</script>
+
+</body>
+</html>

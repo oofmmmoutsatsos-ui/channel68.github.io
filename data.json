@@ -1,0 +1,18 @@
+[
+  {
+    "title": "Morning News",
+    "file": "example.mp4"
+  },
+  {
+    "title": "Evening News",
+    "file": "news.mp4",
+    "thumbnail": "news.png",
+    "category": "News"
+  },
+  {
+    "title": "Sports Highlights",
+    "file": "sports.mp4",
+    "thumbnail": "sports.png",
+    "category": "Sports"
+  }
+]
